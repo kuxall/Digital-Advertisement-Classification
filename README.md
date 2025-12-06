@@ -2,57 +2,123 @@
 
 **AdClassifier Pro** is an enterprise-grade Machine Learning application designed to intelligently categorize digital advertisement text. Built with Streamlit and Scikit-learn, it offers a modern SaaS-like experience for both single-text analysis and bulk data processing.
 
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-ff4b4b)
+
 ## ✨ Key Features
 
-- **📊 Executive Dashboard**: Get a high-level overview of your data distribution and model performance metrics.
-- **🔍 Intelligent Classifier**:
-    - Real-time classification of job descriptions.
-    - **Confidence Scores**: Visual indicators of model certainty.
-- **📂 Batch Processor**:
-    - Bulk upload support for **CSV** and **Excel** files.
-    - Automatic column detection.
-    - **Instant Analytics**: Auto-generated charts for category distribution and confidence spread.
-    - Export results to CSV.
-- **🎨 Customization**:
-    - Toggle between **Midnight Dark** and **Professional Light** themes.
-    - Responsive, mobile-friendly UI.
+### 📊 Executive Dashboard
+- **Real-time Metrics**: View total ads, unique categories, model accuracy, and versioning.
+- **Data Visualization**: Interactive charts showing the distribution of ad categories in the training dataset.
 
-## 🛠️ Installation
+### 🔍 Intelligent Classifier
+- **Real-time Analysis**: Paste any job description or ad text to get an instant classification.
+- **Smart Logic**:
+    - **High Confidence**: Displays the predicted category with a visual confidence bar.
+    - **Low Confidence Handling**: If the model's confidence is below **60%**, the system flags the input as "Unclear/Random" rather than making a potentially incorrect guess. This ensures reliability for end-users.
 
-1.  **Install Python**: Ensure you have Python 3.8+ installed.
-2.  **Create Virtual Environment**:
-    ```bash
-    python -m venv .venv
-    # Windows
-    .venv\Scripts\activate
-    # Mac/Linux
-    source .venv/bin/activate
-    ```
-3.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+### 📂 Batch Processor
+- **Bulk Operations**: Upload `.csv` or `.xlsx` files containing thousands of ad texts.
+- **Automated Labeling**: Processing engine classifies every row.
+- **Uncertainty Detection**: Rows with low confidence scores are explicitly marked as `Uncertain/Random`.
+- **Analytics**: Auto-generated reports on the distributed categories within your batch.
+- **Export**: Download the fully labeled dataset in one click.
 
-## 🚀 Usage
+### 🎨 Premium UI/UX
+- **Dark Mode**: Sleek, high-contrast design for reduced eye strain.
+- **Responsive**: Fully functional on desktop and tablet sizes.
+- **Interactive Outcomes**: clear, card-based result displays.
 
-Run the application locally:
+---
 
+## 🛠️ Tech Stack
+
+- **Frontend**: [Streamlit](https://streamlit.io/)
+- **Machine Learning**: [Scikit-learn](https://scikit-learn.org/)
+- **Data Processing**: [Pandas](https://pandas.pydata.org/) & [NumPy](https://numpy.org/)
+- **Visualization**: Streamlit native charts
+
+---
+
+## 🚀 Installation & Setup
+
+Follow these steps to set up the project locally.
+
+### Prerequisites
+- Python 3.8 or higher
+
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd Digital-Advertisement-Classification
+```
+
+### 2. Create a Virtual Environment
+It's recommended to use a virtual environment to manage dependencies.
+
+**Windows:**
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+**Mac/Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the Application
 ```bash
 streamlit run streamlit_app.py
 ```
+The app will open automatically in your browser at `http://localhost:8501`.
 
-### How to Use
-1.  **Dashboard**: View the model's training stats.
-2.  **Classifier**: Go to the "Classifier" tab, paste an ad, and click "Analyze Now".
-3.  **Batch Processing**:
-    - Go to "Batch Processor".
-    - Upload a CSV/Excel file (e.g., `test_ads.csv`).
-    - Select the text column.
-    - Click "Process Batch" to see charts and download results.
+---
+
+## ⚙️ Configuration
+
+The application allows for some configuration directly in the code logic.
+
+### Confidence Threshold
+In `streamlit_app.py`, you can adjust the sensitivity of the "Smart Logic" by modifying the `CONFIDENCE_THRESHOLD` constant at the top of the file.
+
+```python
+# Default is 60.0%
+CONFIDENCE_THRESHOLD = 60.0
+```
+
+---
 
 ## 📂 Project Structure
 
-- `streamlit_app.py`: Main application logic and UI.
-- `model/`: Contains the pre-trained machine learning model (`adv_model.sav`).
-- `data/`: Contains the dataset used for training/visualization.
-- `notebook/`: Jupyter notebooks used for model development.
+```
+├── data/
+│   └── ConcatenatedDigitalAdData.xlsx  # Training dataset
+├── model/
+│   └── adv_model.sav                   # Pre-trained ML model
+├── notebook/
+│   └── ...                             # Research notebooks
+├── streamlit_app.py                    # Main Application
+├── requirements.txt                    # Python dependencies
+└── README.md                           # Documentation
+```
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+**Q: The Classifier keeps saying "Input unclear".**
+A: This happens when the text provided is too short, gibberish, or completely unrelated to known ad categories. The model confidence is below 60%. Try providing more descriptive text.
+
+**Q: "FileNotFoundError" on startup.**
+A: Ensure you are running the `streamlit run` command from the root directory of the project, so it can find `model/adv_model.sav` and `data/`.
+
+**Q: Can I train my own model?**
+A: Yes, check the `notebook/` directory for the training scripts used to generate the `.sav` file.

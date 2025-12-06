@@ -4,10 +4,13 @@ import pickle
 import streamlit as st
 import warnings
 import time
+import re
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
+
+CONFIDENCE_THRESHOLD = 60.0
 
 # --- CONFIGURATION ---
 st.set_page_config(
@@ -114,6 +117,13 @@ def load_data(file_path):
 def load_model(file_path):
     return pickle.load(open(file_path, 'rb'))
 
+def clean_text(text):
+    text = str(text).lower()
+    text = re.sub(r'<.*?>', '', text)
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
 # --- PAGES ---
 
 def dashboard_page(df):
@@ -156,31 +166,35 @@ def classifier_page(model, job_types):
                 with st.spinner("Processing with AI..."):
                     # Simulate slight delay for effect
                     time.sleep(0.5)
-                    prediction = model.predict([input_text])[0]
+                    cleaned_input = clean_text(input_text)
+                    prediction = model.predict([cleaned_input])[0]
                     
                     confidence = 0.0
                     if hasattr(model, "predict_proba"):
-                        confidence = np.max(model.predict_proba([input_text])[0]) * 100
+                        confidence = np.max(model.predict_proba([cleaned_input])[0]) * 100
                     else:
-                        # Fallback mock confidence for demo if model doesn't support it directly
-                        confidence = np.random.uniform(85, 99)
+                        st.warning("Model does not support probability prediction. Confidence score may be inaccurate.")
+                        confidence = 100.0
 
-                # Result Display
-                st.markdown(f"""
-                <div class="result-card">
-                    <p style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Identified Category</p>
-                    <h1 style="color: #3b82f6; font-size: 3rem; margin: 0.5rem 0;">{prediction}</h1>
-                    <div style="margin-top: 1.5rem;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span>Confidence Score</span>
-                            <span>{confidence:.1f}%</span>
-                        </div>
-                        <div style="background-color: #334155; border-radius: 9999px; height: 8px; width: 100%;">
-                            <div style="background-color: #3b82f6; width: {confidence}%; height: 100%; border-radius: 9999px;"></div>
+                if confidence < CONFIDENCE_THRESHOLD:
+                    st.error("⚠️ Input unclear. Please provide a valid job description.")
+                else:
+                    # Result Display
+                    st.markdown(f"""
+                    <div class="result-card">
+                        <p style="color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Identified Category</p>
+                        <h1 style="color: #3b82f6; font-size: 3rem; margin: 0.5rem 0;">{prediction}</h1>
+                        <div style="margin-top: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Confidence Score</span>
+                                <span>{confidence:.1f}%</span>
+                            </div>
+                            <div style="background-color: #334155; border-radius: 9999px; height: 8px; width: 100%;">
+                                <div style="background-color: #3b82f6; width: {confidence}%; height: 100%; border-radius: 9999px;"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
             else:
                 st.warning("⚠️ Please enter text to analyze.")
 
@@ -215,17 +229,20 @@ def batch_page(model):
                     # Prediction logic
                     def predict(text):
                         try:
-                            return model.predict([str(text)])[0]
+                            return model.predict([clean_text(str(text))])[0]
                         except:
                             return "Error"
                     
                     df['Predicted_Category'] = df[col_name].apply(predict)
                     
-                    # Confidence logic (simplified)
+                    # Confidence logic
                     if hasattr(model, "predict_proba"):
-                        df['Confidence'] = df[col_name].apply(lambda x: np.max(model.predict_proba([str(x)])[0]) * 100)
+                        df['Confidence'] = df[col_name].apply(lambda x: np.max(model.predict_proba([clean_text(str(x))])[0]) * 100)
                     else:
-                        df['Confidence'] = np.random.uniform(85, 99, size=len(df))
+                        df['Confidence'] = 100.0
+                    
+                    # Mark low confidence predictions
+                    df.loc[df['Confidence'] < CONFIDENCE_THRESHOLD, 'Predicted_Category'] = "Uncertain/Random"
 
                 st.success("Processing Complete!")
                 
@@ -283,7 +300,7 @@ def main():
     
     # Load resources
     data_path = "data/ConcatenatedDigitalAdData.xlsx"
-    model_path = "model/adv_model.sav"
+    model_path = "notebook/model/adv_model.sav"
     
     try:
         df_data = load_data(data_path)
