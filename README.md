@@ -1,124 +1,217 @@
 # 🚀 AdClassifier Pro
 
-**AdClassifier Pro** is an enterprise-grade Machine Learning application designed to intelligently categorize digital advertisement text. Built with Streamlit and Scikit-learn, it offers a modern SaaS-like experience for both single-text analysis and bulk data processing.
+> **Paste any ad text → get an instant AI-powered category prediction.**
+> No coding knowledge needed to run this app!
 
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-ff4b4b)
-
-## ✨ Key Features
-
-### 📊 Executive Dashboard
-- **Real-time Metrics**: View total ads, unique categories, model accuracy, and versioning.
-- **Data Visualization**: Interactive charts showing the distribution of ad categories in the training dataset.
-
-### 🔍 Intelligent Classifier
-- **Real-time Analysis**: Paste any job description or ad text to get an instant classification.
-- **Smart Logic**:
-    - **High Confidence**: Displays the predicted category with a visual confidence bar.
-    - **Low Confidence Handling**: If the model's confidence is below **60%**, the system flags the input as "Unclear/Random" rather than making a potentially incorrect guess. This ensures reliability for end-users.
-
-### 📂 Batch Processor
-- **Bulk Operations**: Upload `.csv` or `.xlsx` files containing thousands of ad texts.
-- **Automated Labeling**: Processing engine classifies every row.
-- **Uncertainty Detection**: Rows with low confidence scores are explicitly marked as `Uncertain/Random`.
-- **Analytics**: Auto-generated reports on the distributed categories within your batch.
-- **Export**: Download the fully labeled dataset in one click.
-
-### 🎨 Premium UI/UX
-- **Dark Mode**: Sleek, high-contrast design for reduced eye strain.
-- **Responsive**: Fully functional on desktop and tablet sizes.
-- **Interactive Outcomes**: clear, card-based result displays.
+![Accuracy](https://img.shields.io/badge/Model_Accuracy-97.3%25-brightgreen)
+![Version](https://img.shields.io/badge/Version-v3.0-blueviolet)
 
 ---
 
-## 🛠️ Tech Stack
+## 🟢 Quick Start — Run the App in 5 Steps
 
-- **Frontend**: [Streamlit](https://streamlit.io/)
-- **Machine Learning**: [Scikit-learn](https://scikit-learn.org/)
-- **Data Processing**: [Pandas](https://pandas.pydata.org/) & [NumPy](https://numpy.org/)
-- **Visualization**: Streamlit native charts
+> **Never used Python before? Start here. Follow each step exactly.**
 
 ---
 
-## 🚀 Installation & Setup
+### ✅ Step 1 — Install Python
 
-Follow these steps to set up the project locally.
+1. Go to **https://www.python.org/downloads**
+2. Click the big yellow **"Download Python"** button
+3. Run the installer
+4. ⚠️ **IMPORTANT:** On the first screen, check the box that says **"Add Python to PATH"** before clicking Install
 
-### Prerequisites
-- Python 3.8 or higher
+To verify it worked, open a terminal (search `cmd` in your Start Menu) and type:
+```
+python --version
+```
+You should see something like `Python 3.11.0`. If you do, move to Step 2.
 
-### 1. Clone the Repository
+---
+
+### ✅ Step 2 — Download This Project
+
+**Option A — If you have Git installed:**
 ```bash
 git clone <repository-url>
 cd Digital-Advertisement-Classification
 ```
 
-### 2. Create a Virtual Environment
-It's recommended to use a virtual environment to manage dependencies.
+**Option B — No Git? Download as ZIP:**
+1. Click the green **"Code"** button on GitHub → **"Download ZIP"**
+2. Extract the ZIP to a folder (e.g. `C:\Projects\AdClassifier`)
+3. Open that folder
+
+---
+
+### ✅ Step 3 — Open a Terminal in the Project Folder
 
 **Windows:**
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
+1. Open File Explorer and navigate to the project folder
+2. Click the address bar at the top, type `cmd`, press Enter
+3. A black terminal window will open — you're in the right place ✅
 
-**Mac/Linux:**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
+**Mac / Linux:**
+1. Open Terminal
+2. Type `cd ` (with a space), then drag the project folder into the terminal window, press Enter
 
-### 3. Install Dependencies
+---
+
+### ✅ Step 4 — Install the Requirements
+
+Copy and paste this command into your terminal, then press Enter:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the Application
+This will automatically install everything the app needs. It may take 1–2 minutes.
+
+> 💡 If you see a `pip not found` error, try `python -m pip install -r requirements.txt` instead.
+
+---
+
+### ✅ Step 5 — Run the App
+
 ```bash
 streamlit run streamlit_app.py
 ```
-The app will open automatically in your browser at `http://localhost:8501`.
+
+Your browser will open automatically at **http://localhost:8501** 🎉
+
+> 💡 If the browser doesn't open, manually go to **http://localhost:8501** in Chrome or Firefox.
 
 ---
 
-## ⚙️ Configuration
+### 🛑 How to Stop the App
 
-The application allows for some configuration directly in the code logic.
-
-### Confidence Threshold
-In `streamlit_app.py`, you can adjust the sensitivity of the "Smart Logic" by modifying the `CONFIDENCE_THRESHOLD` constant at the top of the file.
-
-```python
-# Default is 60.0%
-CONFIDENCE_THRESHOLD = 60.0
-```
+Go back to the terminal and press **`Ctrl + C`**.
 
 ---
 
-## 📂 Project Structure
+## 🖥️ Using the App
+
+Once it's running, you'll see 3 pages in the left sidebar:
+
+### 📊 Dashboard
+An overview of the model — total ads, accuracy, and a chart of the training data categories.
+
+### 🔍 Classifier ← *Start here*
+1. Click **"Classifier"** in the sidebar
+2. Paste any advertisement or job description text into the box
+3. Click **"🚀 Analyze Now"**
+4. The app will show which category it belongs to and a confidence score
+
+**Example input you can try:**
+```
+We are looking for a Software Engineer with experience in Python and AWS.
+The ideal candidate will troubleshoot and maintain computer systems and networks.
+```
+
+### 📂 Batch Processor
+Upload a `.csv` or `.xlsx` file with ad text in one column — the app classifies every row at once and lets you download the results.
+
+---
+
+## 🏷️ Categories the App Recognizes
+
+| Category | Examples |
+|---|---|
+| **Jobs – IT** | Software engineers, network admins, developers, IT support |
+| **Jobs – Retail** | Cashiers, store associates, retail managers |
+| **Banking** | Loan officers, financial advisors, bank tellers |
+| **Sell – House** | Houses for sale, real estate listings |
+| **Rent – Apartment** | Apartments for rent, studio listings |
+
+---
+
+## 🤖 How It Works (Plain English)
+
+1. Your text gets cleaned (lowercased, punctuation removed)
+2. It's converted into numbers using a technique called **TF-IDF** (counts how often important words appear)
+3. A **Support Vector Machine** model — trained on 2,805 ad samples — predicts which category it belongs to
+4. A confidence score (0–100%) is shown. If it's below 60%, the app says "unclear" instead of guessing wrong
+
+---
+
+## 📁 What's in This Project
 
 ```
+AdClassifier Pro/
+│
+├── streamlit_app.py        ← The app you run
+├── retrain_model.py        ← Script to regenerate + retrain the model
+├── requirements.txt        ← List of Python packages needed
+├── README.md               ← This guide
+│
 ├── data/
-│   └── ConcatenatedDigitalAdData.xlsx  # Training dataset
-├── model/
-│   └── adv_model.sav                   # Pre-trained ML model
-├── notebook/
-│   └── ...                             # Research notebooks
-├── streamlit_app.py                    # Main Application
-├── requirements.txt                    # Python dependencies
-└── README.md                           # Documentation
+│   ├── ConcatenatedDigitalAdData.xlsx   ← Original training data
+│   └── synthetic_data.csv              ← Extra generated training samples
+│
+└── notebook/
+    └── model/
+        └── adv_model.sav   ← The trained AI model file
 ```
 
 ---
 
-## ❓ FAQ & Troubleshooting
+## ⚙️ Optional: Retrain the Model
 
-**Q: The Classifier keeps saying "Input unclear".**
-A: This happens when the text provided is too short, gibberish, or completely unrelated to known ad categories. The model confidence is below 60%. Try providing more descriptive text.
+> You only need this if you want to improve or update the model. **Skip this if you just want to use the app.**
 
-**Q: "FileNotFoundError" on startup.**
-A: Ensure you are running the `streamlit run` command from the root directory of the project, so it can find `model/adv_model.sav` and `data/`.
+```bash
+python retrain_model.py
+```
 
-**Q: Can I train my own model?**
-A: Yes, check the `notebook/` directory for the training scripts used to generate the `.sav` file.
+This will:
+1. Generate 1,270 new synthetic training samples
+2. Merge them with the original dataset
+3. Retrain the classifier
+4. Save the new model (the old one is backed up automatically)
+
+---
+
+## 🛠️ Tech Stack
+
+| What | Tool |
+|---|---|
+| Web App | Streamlit |
+| ML Model | Scikit-learn (LinearSVC + TF-IDF) |
+| Data | Pandas, NumPy |
+| Styling | Custom CSS, Google Fonts (Inter) |
+
+---
+
+## 🤖 Model Performance (v3.0)
+
+| Category | F1-Score |
+|---|---|
+| Jobs – IT | 0.97 |
+| Jobs – Retail | 0.96 |
+| Banking | 0.97 |
+| Rent – Apartment | 0.97 |
+| Sell – House | 1.00 |
+| **Overall Accuracy** | **97.3%** |
+
+---
+
+## ❓ Troubleshooting
+
+**"streamlit is not recognized"**
+> Your virtual environment isn't active, or Streamlit wasn't installed. Re-run:
+> `pip install -r requirements.txt`
+
+**"No module named streamlit"**
+> Same fix — run `pip install -r requirements.txt`
+
+**"FileNotFoundError" when the app starts**
+> Make sure your terminal is inside the project folder (the one containing `streamlit_app.py`), not a subfolder.
+
+**The classifier keeps saying "Input unclear"**
+> Your text might be too short or too vague. Try pasting a longer, more detailed description with specific keywords related to the job or listing.
+
+**The browser didn't open automatically**
+> Manually go to **http://localhost:8501** in your browser.
