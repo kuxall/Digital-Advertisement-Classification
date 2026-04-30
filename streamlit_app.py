@@ -5,6 +5,7 @@ import streamlit as st
 import warnings
 import time
 import re
+import os
 
 warnings.filterwarnings("ignore")
 
@@ -283,6 +284,146 @@ def batch_page(model):
         except Exception as e:
             st.error(f"Error: {e}")
 
+# ── MODEL COMPARISON PAGE ────────────────────────────────────────────────────
+ALGO_REASONS = {
+    "LinearSVC (Current)": (
+        "⚔️ LinearSVC",
+        "High-dimensional linear classifier. Excellent for TF-IDF sparse text vectors. "
+        "Fast training and inference. Class-weight balancing handles imbalanced data. "
+        "This is the current production model."
+    ),
+    "Logistic Regression": (
+        "📈 Logistic Regression",
+        "Probabilistic linear model with naturally calibrated probability outputs. "
+        "Highly interpretable, extremely effective on TF-IDF features, and stable. "
+        "Strong alternative when confidence scores are critical."
+    ),
+    "Multinomial Naive Bayes": (
+        "🧮 Naive Bayes",
+        "Classic Bayesian text classifier. Assumes feature independence. Extremely fast "
+        "and surprisingly competitive for bag-of-words/TF-IDF features. Best when "
+        "training data is limited or speed is a priority."
+    ),
+    "Random Forest": (
+        "🌲 Random Forest",
+        "Ensemble of 200 decision trees using bagging. Handles non-linear patterns "
+        "and feature interactions naturally. Less optimal on very high-dimensional "
+        "sparse text but robust and resistant to overfitting."
+    ),
+    "Gradient Boosting": (
+        "🚀 Gradient Boosting",
+        "Sequential ensemble that corrects prior model errors. Powerful on structured "
+        "data. Demonstrates the accuracy vs. training-time trade-off — typically much "
+        "slower on text than linear models."
+    ),
+    "K-Nearest Neighbors": (
+        "📍 KNN",
+        "Instance-based learner that classifies by similarity to k nearest neighbours. "
+        "Included as a simple non-parametric baseline. Weaker on high-dimensional "
+        "TF-IDF vectors due to the curse of dimensionality."
+    ),
+}
+
+CHART_LABELS = {
+    "accuracy_comparison.png": "📊 Test Accuracy vs CV Accuracy",
+    "f1_comparison.png": "🎯 Macro F1 vs Weighted F1",
+    "training_time.png": "⏱️ Training Time per Algorithm",
+    "radar_comparison.png": "🕸️ Multi-Metric Radar Chart",
+}
+
+def comparison_page():
+    st.title("🔬 Model Comparison")
+    st.markdown("Compare all trained algorithms across accuracy, F1 score, and training speed.")
+
+    report_dir = "data/comparison_report"
+    csv_path   = os.path.join(report_dir, "algorithm_comparison.csv")
+
+    if not os.path.exists(csv_path):
+        st.warning(
+            "⚠️ No comparison report found. "
+            "Run `python compare_algorithms.py` first to generate results."
+        )
+        st.code("python compare_algorithms.py", language="bash")
+        return
+
+    df = pd.read_csv(csv_path)
+    best = df.iloc[0]
+
+    # Banner
+    st.markdown(f"""
+    <div style="background:linear-gradient(90deg,#1e3a5f,#1e293b);border:1px solid #3b82f6;
+                border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+        <p style="color:#94a3b8;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;
+                  margin:0 0 0.5rem 0;">🏆 Best Performing Algorithm</p>
+        <h2 style="color:#3b82f6;margin:0;">{best['Algorithm']}</h2>
+        <p style="color:#f8fafc;margin:0.5rem 0 0 0;">
+            Test Accuracy: <b style="color:#22c55e;">{best['Test Accuracy']:.2f}%</b> &nbsp;|&nbsp;
+            Macro F1: <b style="color:#f59e0b;">{best['Macro F1']:.2f}%</b> &nbsp;|&nbsp;
+            CV Mean: <b style="color:#a78bfa;">{best['CV Mean']:.2f}% ± {best['CV Std']:.2f}%</b>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Ranking table
+    st.markdown("### 📋 Full Algorithm Rankings")
+    styled = df.copy()
+    styled.index = styled.index + 1  # 1-based rank
+    styled.insert(0, "Rank", styled.index)
+    styled = styled.drop(columns=["Rank"])
+    st.dataframe(
+        styled.style.format({
+            "Test Accuracy": "{:.2f}%",
+            "Macro F1": "{:.2f}%",
+            "Weighted F1": "{:.2f}%",
+            "CV Mean": "{:.2f}%",
+            "CV Std": "{:.2f}%",
+            "Train Time (s)": "{:.1f}s",
+        }).background_gradient(subset=["Test Accuracy"], cmap="Blues"),
+        use_container_width=True,
+        hide_index=False,
+    )
+
+    # Charts
+    st.markdown("### 📈 Visual Comparisons")
+    chart_files = list(CHART_LABELS.keys())
+    col1, col2 = st.columns(2)
+    for i, fname in enumerate(chart_files):
+        fpath = os.path.join(report_dir, fname)
+        if os.path.exists(fpath):
+            with (col1 if i % 2 == 0 else col2):
+                st.markdown(f"**{CHART_LABELS[fname]}**")
+                st.image(fpath, use_column_width=True)
+
+    # Confusion matrices
+    st.markdown("### 🗂️ Per-Algorithm Confusion Matrices")
+    cm_files = sorted([f for f in os.listdir(report_dir) if f.startswith("cm_")])
+    if cm_files:
+        cm_cols = st.columns(2)
+        for i, fname in enumerate(cm_files):
+            fpath = os.path.join(report_dir, fname)
+            algo_name = fname.replace("cm_", "").replace("_", " ").replace(".png", "")
+            with cm_cols[i % 2]:
+                st.markdown(f"**{algo_name}**")
+                st.image(fpath, use_column_width=True)
+
+    # Why each algorithm section
+    st.markdown("### 💡 Why Each Algorithm?")
+    for algo_key, (label, reason) in ALGO_REASONS.items():
+        match = df[df["Algorithm"] == algo_key]
+        acc_str = f"{match.iloc[0]['Test Accuracy']:.2f}%" if not match.empty else "N/A"
+        rank_num = match.index[0] + 1 if not match.empty else "?"
+        with st.expander(f"#{rank_num} {label}  —  Accuracy: {acc_str}"):
+            st.markdown(f"**{label}**")
+            st.write(reason)
+            if not match.empty:
+                r = match.iloc[0]
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Test Accuracy", f"{r['Test Accuracy']:.2f}%")
+                c2.metric("Macro F1",      f"{r['Macro F1']:.2f}%")
+                c3.metric("CV Mean",        f"{r['CV Mean']:.2f}%")
+                c4.metric("Train Time",     f"{r['Train Time (s)']:.1f}s")
+
+
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 def main():
     apply_theme()
@@ -304,7 +445,7 @@ def main():
 
         page = st.radio(
             "Navigate",
-            ["Dashboard", "Classifier", "Batch Processor"],
+            ["Dashboard", "Classifier", "Batch Processor", "Model Comparison"],
             label_visibility="collapsed"
         )
 
@@ -324,6 +465,8 @@ def main():
         classifier_page(model, job_types)
     elif page == "Batch Processor":
         batch_page(model)
+    elif page == "Model Comparison":
+        comparison_page()
 
 
 if __name__ == "__main__":

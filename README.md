@@ -1,217 +1,226 @@
-# 🚀 AdClassifier Pro
+# AdClassifier Pro 🚀
 
-> **Paste any ad text → get an instant AI-powered category prediction.**
-> No coding knowledge needed to run this app!
-
-![Status](https://img.shields.io/badge/Status-Active-success)
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-ff4b4b)
-![Accuracy](https://img.shields.io/badge/Model_Accuracy-97.3%25-brightgreen)
-![Version](https://img.shields.io/badge/Version-v3.0-blueviolet)
+> **Intelligent Digital Advertisement Classification System**  
+> Automatically categorises job ads, house listings, apartment rentals, retail postings, and banking ads using multiple machine learning algorithms.
 
 ---
 
-## 🟢 Quick Start — Run the App in 5 Steps
-
-> **Never used Python before? Start here. Follow each step exactly.**
-
----
-
-### ✅ Step 1 — Install Python
-
-1. Go to **https://www.python.org/downloads**
-2. Click the big yellow **"Download Python"** button
-3. Run the installer
-4. ⚠️ **IMPORTANT:** On the first screen, check the box that says **"Add Python to PATH"** before clicking Install
-
-To verify it worked, open a terminal (search `cmd` in your Start Menu) and type:
-```
-python --version
-```
-You should see something like `Python 3.11.0`. If you do, move to Step 2.
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Categories](#categories)
+3. [Dataset](#dataset)
+4. [Algorithm Comparison](#algorithm-comparison)
+5. [Why Each Algorithm?](#why-each-algorithm)
+6. [Project Structure](#project-structure)
+7. [Setup & Installation](#setup--installation)
+8. [Running the App](#running-the-app)
+9. [Retraining the Model](#retraining-the-model)
+10. [Results Summary](#results-summary)
 
 ---
 
-### ✅ Step 2 — Download This Project
+## Project Overview
 
-**Option A — If you have Git installed:**
-```bash
-git clone <repository-url>
-cd Digital-Advertisement-Classification
-```
+AdClassifier Pro is a full-stack NLP classification application that:
 
-**Option B — No Git? Download as ZIP:**
-1. Click the green **"Code"** button on GitHub → **"Download ZIP"**
-2. Extract the ZIP to a folder (e.g. `C:\Projects\AdClassifier`)
-3. Open that folder
+- **Classifies** digital advertisements into 5 categories in real-time
+- **Compares** 6 different ML algorithms with metrics, charts, and confusion matrices
+- **Provides** a Streamlit web dashboard for single-input classification, batch CSV/Excel processing, and algorithm comparison
+- **Handles class imbalance** via synthetic data augmentation and `class_weight="balanced"`
+
+The best-performing model (LinearSVC) is automatically saved and used in production.
 
 ---
 
-### ✅ Step 3 — Open a Terminal in the Project Folder
+## Categories
 
-**Windows:**
-1. Open File Explorer and navigate to the project folder
-2. Click the address bar at the top, type `cmd`, press Enter
-3. A black terminal window will open — you're in the right place ✅
-
-**Mac / Linux:**
-1. Open Terminal
-2. Type `cd ` (with a space), then drag the project folder into the terminal window, press Enter
-
----
-
-### ✅ Step 4 — Install the Requirements
-
-Copy and paste this command into your terminal, then press Enter:
-
-```bash
-pip install -r requirements.txt
-```
-
-This will automatically install everything the app needs. It may take 1–2 minutes.
-
-> 💡 If you see a `pip not found` error, try `python -m pip install -r requirements.txt` instead.
-
----
-
-### ✅ Step 5 — Run the App
-
-```bash
-streamlit run streamlit_app.py
-```
-
-Your browser will open automatically at **http://localhost:8501** 🎉
-
-> 💡 If the browser doesn't open, manually go to **http://localhost:8501** in Chrome or Firefox.
-
----
-
-### 🛑 How to Stop the App
-
-Go back to the terminal and press **`Ctrl + C`**.
-
----
-
-## 🖥️ Using the App
-
-Once it's running, you'll see 3 pages in the left sidebar:
-
-### 📊 Dashboard
-An overview of the model — total ads, accuracy, and a chart of the training data categories.
-
-### 🔍 Classifier ← *Start here*
-1. Click **"Classifier"** in the sidebar
-2. Paste any advertisement or job description text into the box
-3. Click **"🚀 Analyze Now"**
-4. The app will show which category it belongs to and a confidence score
-
-**Example input you can try:**
-```
-We are looking for a Software Engineer with experience in Python and AWS.
-The ideal candidate will troubleshoot and maintain computer systems and networks.
-```
-
-### 📂 Batch Processor
-Upload a `.csv` or `.xlsx` file with ad text in one column — the app classifies every row at once and lets you download the results.
-
----
-
-## 🏷️ Categories the App Recognizes
-
-| Category | Examples |
+| Category | Description |
 |---|---|
-| **Jobs – IT** | Software engineers, network admins, developers, IT support |
-| **Jobs – Retail** | Cashiers, store associates, retail managers |
-| **Banking** | Loan officers, financial advisors, bank tellers |
-| **Sell – House** | Houses for sale, real estate listings |
-| **Rent – Apartment** | Apartments for rent, studio listings |
+| `Jobs – IT` | Software engineering, DevOps, cloud, sysadmin, cybersecurity roles |
+| `Jobs – Retail` | Cashier, sales associate, store manager, stock associate roles |
+| `Banking` | Loan officer, financial advisor, credit analyst, accountant roles |
+| `Sell – House` | Property listings with bedrooms, bathrooms, price, features |
+| `Rent – Apartment` | Apartment rental ads with rent price, amenities, availability |
 
 ---
 
-## 🤖 How It Works (Plain English)
+## Dataset
 
-1. Your text gets cleaned (lowercased, punctuation removed)
-2. It's converted into numbers using a technique called **TF-IDF** (counts how often important words appear)
-3. A **Support Vector Machine** model — trained on 2,805 ad samples — predicts which category it belongs to
-4. A confidence score (0–100%) is shown. If it's below 60%, the app says "unclear" instead of guessing wrong
+| Source | Samples |
+|---|---|
+| Original (`ConcatenatedDigitalAdData.xlsx`) | ~1,541 |
+| Synthetic (generated via `retrain_model.py`) | ~1,270 |
+| **Total after merging** | **2,805** |
 
----
-
-## 📁 What's in This Project
+**Class distribution after balancing:**
 
 ```
-AdClassifier Pro/
+Sell – House        607
+Jobs – Retail       552
+Rent – Apartment    550
+Jobs – IT           549
+Banking             547
+```
+
+Train / Test split: **80% / 20%** (stratified)
+
+---
+
+## Algorithm Comparison
+
+Six algorithms were trained and evaluated on identical data splits. Results are ranked by **Test Accuracy**:
+
+| Rank | Algorithm | Test Accuracy | Macro F1 | Weighted F1 | CV Mean (5-fold) | CV Std | Train Time |
+|---|---|---|---|---|---|---|---|
+| 🥇 1 | **LinearSVC** *(Production)* | **97.33%** | **97.28%** | **97.32%** | **97.54%** | ±0.35% | 0.8s |
+| 🥈 2 | Logistic Regression | 96.97% | 96.91% | 96.97% | 97.54% | ±0.58% | 1.5s |
+| 🥈 2 | Random Forest | 96.97% | 96.94% | 96.98% | 96.47% | ±0.67% | 1.4s |
+| 4 | Multinomial Naive Bayes | 96.79% | 96.73% | 96.79% | 97.08% | ±0.49% | **0.3s** |
+| 5 | Gradient Boosting | 95.37% | 95.35% | 95.40% | 96.04% | ±0.73% | 65.9s |
+| 6 | K-Nearest Neighbors | 94.65% | 94.54% | 94.63% | 95.22% | ±0.86% | 0.5s |
+
+> All algorithms use TF-IDF vectorization (bigrams, 20k max features) as input features.
+
+---
+
+## Why Each Algorithm?
+
+### ⚔️ LinearSVC *(Current Production Model)*
+**Why chosen:** Linear SVM is the gold standard for high-dimensional sparse text classification. TF-IDF produces very large sparse feature vectors where linear boundaries separate classes cleanly. `CalibratedClassifierCV` wraps it to produce probability estimates. It achieves the best accuracy (97.33%) with the second-fastest training time (0.8s), making it ideal for production.
+
+### 📈 Logistic Regression
+**Why included:** A natural probabilistic alternative to SVM. Outputs well-calibrated class probabilities without wrapping. Tied for 2nd place at 96.97% with similar CV performance to LinearSVC (97.54%). Highly interpretable — coefficients directly indicate which words drive each classification.
+
+### 🧮 Multinomial Naive Bayes
+**Why included:** The classic NLP baseline algorithm. Assumes conditional independence of features given the class. Extremely fast (0.3s training) and achieved 96.79% — impressively close to the top models. Best choice when training resources are severely limited or real-time retraining is needed.
+
+### 🌲 Random Forest
+**Why included:** A bagging ensemble of 200 decision trees. Handles non-linear feature interactions and is naturally resistant to overfitting. Tied for 2nd place (96.97%) but has a lower CV score (96.47%), suggesting it generalizes slightly less consistently than linear models on text data.
+
+### 🚀 Gradient Boosting
+**Why included:** A powerful sequential boosting ensemble that iteratively corrects prior model errors. Strong on structured tabular data. Demonstrated here to show the accuracy–speed trade-off: only 95.37% accuracy while taking 65.9 seconds to train — far slower than linear models on text.
+
+### 📍 K-Nearest Neighbors
+**Why included:** A non-parametric, instance-based learner. Classifies new samples by voting from the k=7 nearest training examples using cosine similarity. Included as a simple distance-based baseline. Performs weakest (94.65%) due to the curse of dimensionality in high-dimensional TF-IDF space.
+
+---
+
+## Project Structure
+
+```
+Digital-Advertisement-Classification/
 │
-├── streamlit_app.py        ← The app you run
-├── retrain_model.py        ← Script to regenerate + retrain the model
-├── requirements.txt        ← List of Python packages needed
-├── README.md               ← This guide
+├── streamlit_app.py          # Main Streamlit web application
+├── retrain_model.py          # Generates synthetic data & retrains LinearSVC
+├── compare_algorithms.py     # Trains & compares all 6 algorithms
+├── requirements.txt          # Python dependencies
 │
 ├── data/
-│   ├── ConcatenatedDigitalAdData.xlsx   ← Original training data
-│   └── synthetic_data.csv              ← Extra generated training samples
+│   ├── ConcatenatedDigitalAdData.xlsx  # Original labelled dataset
+│   ├── synthetic_data.csv              # Augmented synthetic training samples
+│   └── comparison_report/             # Auto-generated by compare_algorithms.py
+│       ├── algorithm_comparison.csv    # Numerical results table
+│       ├── algorithm_reasons.txt       # Text explanations per algorithm
+│       ├── accuracy_comparison.png     # Bar chart: accuracy vs CV
+│       ├── f1_comparison.png           # Bar chart: Macro F1 vs Weighted F1
+│       ├── training_time.png           # Horizontal bar: training speed
+│       ├── radar_comparison.png        # Radar chart: multi-metric overview
+│       ├── cm_LinearSVC_Current.png    # Confusion matrix per algorithm
+│       └── cm_*.png                   # (one per algorithm)
 │
 └── notebook/
     └── model/
-        └── adv_model.sav   ← The trained AI model file
+        ├── adv_model.sav         # Active production model (best algorithm)
+        └── adv_model_backup.sav  # Previous model backup
 ```
 
 ---
 
-## ⚙️ Optional: Retrain the Model
+## Setup & Installation
 
-> You only need this if you want to improve or update the model. **Skip this if you just want to use the app.**
+**Requirements:** Python 3.9+
 
+```bash
+# 1. Clone the repository
+git clone https://github.com/kuxall/Digital-Advertisement-Classification.git
+cd Digital-Advertisement-Classification
+
+# 2. Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # Mac/Linux
+
+# 3. Install dependencies
+pip install -r requirements.txt
+```
+
+`requirements.txt` includes:
+```
+streamlit
+scikit-learn
+pandas
+numpy
+openpyxl
+matplotlib
+seaborn
+```
+
+---
+
+## Running the App
+
+```bash
+# Start the Streamlit dashboard
+streamlit run streamlit_app.py
+```
+
+The app opens at `http://localhost:8501` with 4 pages:
+
+| Page | Description |
+|---|---|
+| **Dashboard** | Data distribution, total samples, category counts |
+| **Classifier** | Real-time single-ad classification with confidence scores |
+| **Batch Processor** | Upload CSV/Excel for bulk classification and download |
+| **Model Comparison** | Interactive charts and rankings for all 6 algorithms |
+
+---
+
+## Retraining the Model
+
+### Retrain with synthetic data augmentation (LinearSVC only):
 ```bash
 python retrain_model.py
 ```
 
+### Run full multi-algorithm comparison + save best model:
+```bash
+python compare_algorithms.py
+```
+
 This will:
-1. Generate 1,270 new synthetic training samples
-2. Merge them with the original dataset
-3. Retrain the classifier
-4. Save the new model (the old one is backed up automatically)
+1. Train all 6 algorithms on the same data split
+2. Print a full comparison table to the console
+3. Save charts and CSVs to `data/comparison_report/`
+4. Automatically save the **best model** to `notebook/model/adv_model.sav`
+5. Back up the previous model to `adv_model_backup.sav`
+
+After running, restart the Streamlit app — it will load the new best model automatically.
 
 ---
 
-## 🛠️ Tech Stack
+## Results Summary
 
-| What | Tool |
-|---|---|
-| Web App | Streamlit |
-| ML Model | Scikit-learn (LinearSVC + TF-IDF) |
-| Data | Pandas, NumPy |
-| Styling | Custom CSS, Google Fonts (Inter) |
+The system achieves production-grade accuracy with a highly balanced dataset:
 
----
+- **Best Model:** LinearSVC + TF-IDF (bigrams)
+- **Test Accuracy:** 97.33%
+- **5-Fold CV Accuracy:** 97.54% (±0.35%)
+- **Training Samples:** 2,805 (real + synthetic)
+- **Categories:** 5
+- **Training Time:** < 1 second
 
-## 🤖 Model Performance (v3.0)
-
-| Category | F1-Score |
-|---|---|
-| Jobs – IT | 0.97 |
-| Jobs – Retail | 0.96 |
-| Banking | 0.97 |
-| Rent – Apartment | 0.97 |
-| Sell – House | 1.00 |
-| **Overall Accuracy** | **97.3%** |
+> The linear models (LinearSVC, Logistic Regression) consistently outperform ensemble and distance-based methods on TF-IDF text features, confirming well-established NLP research findings. Naive Bayes is the recommended lightweight alternative if inference speed is critical.
 
 ---
 
-## ❓ Troubleshooting
-
-**"streamlit is not recognized"**
-> Your virtual environment isn't active, or Streamlit wasn't installed. Re-run:
-> `pip install -r requirements.txt`
-
-**"No module named streamlit"**
-> Same fix — run `pip install -r requirements.txt`
-
-**"FileNotFoundError" when the app starts**
-> Make sure your terminal is inside the project folder (the one containing `streamlit_app.py`), not a subfolder.
-
-**The classifier keeps saying "Input unclear"**
-> Your text might be too short or too vague. Try pasting a longer, more detailed description with specific keywords related to the job or listing.
-
-**The browser didn't open automatically**
-> Manually go to **http://localhost:8501** in your browser.
+*Built with Python · scikit-learn · Streamlit · TF-IDF · LinearSVC*
